@@ -19,10 +19,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
         // 사후처리 위한 ActivityResultLauncher
-        val requestLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
+        val requestLauncher = registerForActivityResult(
             // Contract
-            ActivityResultContracts.StartActivityForResult()){
+            ActivityResultContracts.StartActivityForResult())
+        {
             // Callback
             it.data!!.getStringExtra("result")?.let {
                 datas?.add(it)
@@ -32,16 +34,21 @@ class MainActivity : AppCompatActivity() {
         // launch
         binding.mainFab.setOnClickListener{
             val intent = Intent(this, AddActivity::class.java)
-                requestLauncher.launch(intent)
+            requestLauncher.launch(intent)
         }
 
-        // 상태값 있다면(번들 객체 널이 아닌 경우) 목록에 반영.
-        datas = savedInstanceState?.let {
-            it.getStringArrayList("datas")?.toMutableList()
-        }?: let {
-            // Null 아닐 경우 목록 데이터 초기화
-            mutableListOf<String>()
+        datas = mutableListOf<String>()
+
+        // DB 데이터 불러오기
+        val db = DBHelper(this).readableDatabase
+        val cursor = db.rawQuery("select * from TODO_TB", null)
+
+        cursor.run {
+            while(moveToNext()){
+                datas?.add(cursor.getString(1))
+            }
         }
+        db.close()
 
         // 화면 구성
         val layoutManager = LinearLayoutManager(this)
@@ -51,12 +58,6 @@ class MainActivity : AppCompatActivity() {
         binding.mainRecyclerView.addItemDecoration(
             DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         )
-    }
-
-    // 상태 데이터 유지
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putStringArrayList("datas", ArrayList(datas))
     }
 
 
