@@ -3,6 +3,7 @@ package com.example.todopractice
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -13,6 +14,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding : ActivityMainBinding
     var datas: MutableList<String>? = null
     lateinit var adapter: MyAdapter
+    var selectedPosition: Int? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +61,20 @@ class MainActivity : AppCompatActivity() {
         binding.mainRecyclerView.addItemDecoration(
             DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         )
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when(item.itemId) {
+        R.id.del_btn -> {
+            selectedPosition?.let { positionToRemove ->
+                val db = DBHelper(this).writableDatabase
+                val itemToDelete = datas?.get(positionToRemove)
+                db.execSQL("DELETE FROM TODO_TB WHERE todo = ?", arrayOf(itemToDelete))
+                db.close()
+                adapter.removeItem(positionToRemove)
+            }
+            true
+        }
+        else -> true
     }
 
 
