@@ -14,7 +14,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding : ActivityMainBinding
     var datas: MutableList<String>? = null
     lateinit var adapter: MyAdapter
-    var selectedPosition: Int? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,21 +60,14 @@ class MainActivity : AppCompatActivity() {
         binding.mainRecyclerView.addItemDecoration(
             DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         )
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean = when(item.itemId) {
-        R.id.del_btn -> {
-            selectedPosition?.let { positionToRemove ->
-                val db = DBHelper(this).writableDatabase
-                val itemToDelete = datas?.get(positionToRemove)
-                db.execSQL("DELETE FROM TODO_TB WHERE todo = ?", arrayOf(itemToDelete))
+        adapter.itemClickListener = object : MyAdapter.OnItemClickListener {
+            override fun onItemDeleteClick(position: Int) {
+                val itemToRemove = datas?.get(position)
+                val db = DBHelper(this@MainActivity).writableDatabase
+                db.execSQL("DELETE FROM TODO_TB WHERE todo = ?", arrayOf(itemToRemove))
                 db.close()
-                adapter.removeItem(positionToRemove)
+                adapter.removeItem(position)
             }
-            true
         }
-        else -> true
     }
-
-
 }

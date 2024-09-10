@@ -6,19 +6,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.todopractice.databinding.ItemRecyclerviewBinding
 
 class MyViewHolder(val binding: ItemRecyclerviewBinding): RecyclerView.ViewHolder(binding.root) {
-    init {
-        binding.delBtn.setOnClickListener {
-            val position = adapterPosition
-            if(position != RecyclerView.NO_POSITION) {
-                (binding.root.context as MainActivity).adapter.removeItem(position)
-                (binding.root.context as MainActivity).selectedPosition = position
-
-            }
-        }
-    }
 }
 
 class MyAdapter(val datas: MutableList<String>?): RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+
+    interface OnItemClickListener {
+        fun onItemDeleteClick(position: Int)
+    }
+    var itemClickListener: OnItemClickListener? = null
+
     override fun getItemCount(): Int {
         return datas?.size ?: 0
     }
@@ -29,6 +25,9 @@ class MyAdapter(val datas: MutableList<String>?): RecyclerView.Adapter<RecyclerV
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val binding = (holder as MyViewHolder).binding
         binding.itemData.text=datas!![position]
+        binding.delBtn.setOnClickListener {
+            itemClickListener?.onItemDeleteClick(position)
+        }
     }
 
     fun removeItem(position: Int){
