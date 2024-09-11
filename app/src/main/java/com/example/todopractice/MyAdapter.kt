@@ -12,6 +12,7 @@ class MyAdapter(val datas: MutableList<String>?): RecyclerView.Adapter<RecyclerV
 
     interface OnItemClickListener {
         fun onItemDeleteClick(position: Int)
+        fun onItemEditClick(position: Int)
     }
     var itemClickListener: OnItemClickListener? = null
 
@@ -27,6 +28,9 @@ class MyAdapter(val datas: MutableList<String>?): RecyclerView.Adapter<RecyclerV
         binding.itemData.text=datas!![position]
         binding.delBtn.setOnClickListener {
             itemClickListener?.onItemDeleteClick(position)
+        }
+        binding.editBtn.setOnClickListener {
+            itemClickListener?.onItemEditClick(position)
         }
     }
 

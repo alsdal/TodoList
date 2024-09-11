@@ -68,6 +68,15 @@ class MainActivity : AppCompatActivity() {
                 db.close()
                 adapter.removeItem(position)
             }
+
+            override fun onItemEditClick(position: Int) {
+                val itemToEdit = datas?.get(position)
+                val intent = Intent(this@MainActivity, EditActivity::class.java).apply {
+                    putExtra("todo", itemToEdit)
+                    putExtra("position", position)
+                }
+                startActivity(intent)
+            }
         }
     }
 }
