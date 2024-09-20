@@ -33,7 +33,7 @@ class AddActivity : AppCompatActivity() {
             db.close()
             // 메인 액티비티로 화면 전환, 입력 정보 전달
             val intent = intent
-            intent.putExtra("result", inputData)
+            intent.putExtra("addedText", inputData)
             setResult(Activity.RESULT_OK, intent)
             finish()
             true

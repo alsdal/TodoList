@@ -22,18 +22,18 @@ class EditActivity : AppCompatActivity() {
     // save버튼 눌렀을 때 입력한 데이터 인텐트에 담아 MainActivity에게 전달
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when(item.itemId){
         R.id.menu_add_save -> {
-            val position = intent.getStringExtra("position")?.toInt()
+            val position = intent.getIntExtra("position", -1)
             val inputData = binding.editEditView.text.toString()
             val db = DBHelper(this).writableDatabase
             db.execSQL(
-                "UPDATE TODO_TB SET todo = ? WHERE ?",
-                arrayOf(inputData, position)
+                "UPDATE TODO_TB SET todo = ? WHERE todo = ?",
+                arrayOf(inputData, intent.getStringExtra("todo"))
             )
             db.close()
 
             // 메인 액티비티로 화면 전환, 입력 정보 전달
             val intent = intent
-            intent.putExtra("result", inputData)
+            intent.putExtra("editedText", inputData)
             setResult(Activity.RESULT_OK, intent)
             finish()
             true

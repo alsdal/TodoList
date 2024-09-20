@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todopractice.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-    lateinit var binding : ActivityMainBinding
+    lateinit var binding: ActivityMainBinding
     var datas: MutableList<String>? = null
     lateinit var adapter: MyAdapter
 
@@ -21,20 +21,31 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
         // 사후처리 위한 ActivityResultLauncher
         val requestLauncher = registerForActivityResult(
             // Contract
-            ActivityResultContracts.StartActivityForResult())
-        {
-            // Callback
-            it.data!!.getStringExtra("result")?.let {
-                datas?.add(it)
-                adapter.notifyDataSetChanged()
+            ActivityResultContracts.StartActivityForResult()
+        )
+        { result ->
+            val data = result.data
+            // AddActivity Callback
+            if (result.resultCode == RESULT_OK && data != null) {
+                data.getStringExtra("addedText")?.let {
+                    datas?.add(it)
+                    adapter.notifyDataSetChanged()
+                }
+                // EditActivity Callback
+                data.getStringExtra("editedText")?.let { editedText ->
+                    val position = data.getIntExtra("position", -1)
+                    if (position != -1 && datas != null) {
+                        datas!![position] = editedText
+                        adapter.notifyItemChanged(position)
+                    }
+                }
             }
         }
         // launch
-        binding.mainFab.setOnClickListener{
+        binding.mainFab.setOnClickListener {
             val intent = Intent(this, AddActivity::class.java)
             requestLauncher.launch(intent)
         }
@@ -46,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         val cursor = db.rawQuery("select * from TODO_TB", null)
 
         cursor.run {
-            while(moveToNext()){
+            while (moveToNext()) {
                 datas?.add(cursor.getString(1))
             }
         }
@@ -54,12 +65,13 @@ class MainActivity : AppCompatActivity() {
 
         // 화면 구성
         val layoutManager = LinearLayoutManager(this)
-        binding.mainRecyclerView.layoutManager=layoutManager
-        adapter=MyAdapter(datas)
-        binding.mainRecyclerView.adapter=adapter
+        binding.mainRecyclerView.layoutManager = layoutManager
+        adapter = MyAdapter(datas)
+        binding.mainRecyclerView.adapter = adapter
         binding.mainRecyclerView.addItemDecoration(
             DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         )
+
         adapter.itemClickListener = object : MyAdapter.OnItemClickListener {
             override fun onItemDeleteClick(position: Int) {
                 val itemToRemove = datas?.get(position)
@@ -75,7 +87,7 @@ class MainActivity : AppCompatActivity() {
                     putExtra("todo", itemToEdit)
                     putExtra("position", position)
                 }
-                startActivity(intent)
+                requestLauncher.launch(intent)
             }
         }
     }

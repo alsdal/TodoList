@@ -39,5 +39,9 @@ class MyAdapter(val datas: MutableList<String>?): RecyclerView.Adapter<RecyclerV
         notifyItemRemoved(position)
         notifyItemRangeChanged(position, datas?.size ?: 0)
     }
+    fun editItem(position: Int, editedText: String) {
+        datas?.set(position, editedText)
+        notifyItemChanged(position)
+    }
 
 }
