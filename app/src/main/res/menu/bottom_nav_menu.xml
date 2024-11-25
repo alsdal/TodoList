@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
+    <item
+        android:id="@+id/fragment_list"
+        android:title="할일목록"
+        android:icon="@drawable/ic_list"/>
+    <item
+        android:id="@+id/fragment_alarm"
+        android:title="알람"
+        android:icon="@drawable/ic_alarm"/>
+    <item
+        android:id="@+id/fragment_settings"
+        android:title="설정"
+        android:icon="@drawable/ic_settings"/>
 </menu>
